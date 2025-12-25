@@ -1,15 +1,29 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Script from "next/script";
 import CodeEditor from "../components/CodeEditor";
 import Visualizer from "../components/Visualizer";
 import { SETUP_CODE } from "../utils/pythonSetup";
+import { useNodesState, useEdgesState } from "reactflow";
 
 export default function Home() {
-  const [code, setCode] = useState("# Try printing something\nprint('Hello from Python!')");
-  const [output, setOutput] = useState("");
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+
+  const [code, setCode] = useState("# create nodes to visualize!\n# eg. head = Node(5)\n# eg. head.next = Node(18)")
+  const [output, setOutput] = useState("")
   const [isPyodideReady, setIsPyodideReady] = useState(false);
   const pyodideRef = useRef(null);
+
+  const [isAutoRun, SetIsAutoRun] = useState(true);
+  
+  useEffect(() => {
+    if (!isAutoRun || !pyodideRef.current) return;
+
+    const timer = setTimeout(() => {
+      runCode()
+    }, 3000);
+  })
 
   // Robust Initialization Function
   async function initPyodide() {
@@ -38,7 +52,19 @@ export default function Home() {
     try {
       const py = pyodideRef.current;
       py.setStdout({ batched: (msg) => setOutput((prev) => prev + msg + "\n") });
+
+      // run user code
       await py.runPythonAsync(SETUP_CODE + "\n" + code);
+
+      // run the pythonSetup code
+      const stateJSON = await py.runPythonAsync("get_linked_list_state()");     // gives us json which we will parse further
+      const state = JSON.parse(stateJSON);
+
+      // update the visualizer
+      console.log("graph state:", state);
+      setNodes(state.nodes);
+      setEdges(state.edges);
+
     } catch (err) {
       setOutput(`Runtime Error: ${err.message}`);
     }
@@ -57,7 +83,7 @@ export default function Home() {
 
       {/* Visualizer Panel */}
       <div className="w-[60%] h-full relative border-r border-gray-800">
-        <Visualizer />
+        <Visualizer nodes={nodes} edges={edges}/>
         <div className="absolute bottom-0 w-full h-32 bg-gray-900 border-t border-gray-700 p-2 font-mono text-xs overflow-auto opacity-90">
              <div className="text-gray-400 mb-1">CONSOLE OUTPUT:</div>
              <pre>{output}</pre>
