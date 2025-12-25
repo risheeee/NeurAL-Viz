@@ -15,7 +15,7 @@ export default function Home() {
   const [isPyodideReady, setIsPyodideReady] = useState(false);
   const pyodideRef = useRef(null);
 
-  const [isAutoRun, SetIsAutoRun] = useState(true);
+  const [isAutoRun, setIsAutoRun] = useState(true);
   
   useEffect(() => {
     if (!isAutoRun || !pyodideRef.current) return;
@@ -23,7 +23,9 @@ export default function Home() {
     const timer = setTimeout(() => {
       runCode()
     }, 3000);
-  })
+
+    return () => clearTimeout(timer);
+  }, [code, isAutoRun, isPyodideReady]);
 
   // Robust Initialization Function
   async function initPyodide() {
@@ -99,6 +101,18 @@ export default function Home() {
         >
           {!isPyodideReady ? "Loading Engine..." : "Run Code ▶"}
         </button>
+        <div className="absolute top-6 right-42 z-10 flex items-center gap-2 bg-gray-800 px-3 py-1 rounded-full border border-gray-600">
+          <div className={`w-2 h-2 rounded-full ${isAutoRun ? "bg-green-500 animate-pulse" : "bg-red-500"}`} />
+          <label className="text-xs font-bold text-gray-300 cursor-pointer select-none">
+            <input 
+              type="checkbox" 
+              className="hidden" 
+              checked={isAutoRun} 
+              onChange={(e) => setIsAutoRun(e.target.checked)} 
+            />
+            {isAutoRun ? "Live Mode ON" : "Live Mode OFF"}
+          </label>
+          </div>
       </div>
 
       {/* Code Editor Panel */}
