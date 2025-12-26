@@ -4,7 +4,7 @@ export default function LinkedListNode({ data }) {
   return (
     <div className="relative">
       {/* 1. The Pointers Stacked Above */}
-      <div className="absolute -top-12 left-0 w-full flex flex-col-reverse items-center gap-1">
+      <div className="absolute bottom-[100%] left-0 w-full flex flex-col-reverse items-center gap-1 mb-2 pointer-events-none">
         {data.pointers && data.pointers.map((ptr) => (
           <div 
             key={ptr} 

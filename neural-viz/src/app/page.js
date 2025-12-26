@@ -5,6 +5,7 @@ import CodeEditor from "../components/CodeEditor";
 import Visualizer from "../components/Visualizer";
 import { SETUP_CODE } from "../utils/pythonSetup";
 import { useNodesState, useEdgesState } from "reactflow";
+import PresetSelector from "../components/PresetSelector";
 
 export default function Home() {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -22,14 +23,12 @@ export default function Home() {
 
     const timer = setTimeout(() => {
       runCode()
-    }, 3000);
+    }, 1500);
 
     return () => clearTimeout(timer);
   }, [code, isAutoRun, isPyodideReady]);
 
-  // Robust Initialization Function
   async function initPyodide() {
-    // Check if the global function exists. If not, retry in 500ms.
     if (typeof window.loadPyodide !== "function") {
       console.warn("Pyodide not fully loaded yet. Retrying...");
       setTimeout(initPyodide, 500); 
@@ -55,14 +54,11 @@ export default function Home() {
       const py = pyodideRef.current;
       py.setStdout({ batched: (msg) => setOutput((prev) => prev + msg + "\n") });
 
-      // run user code
       await py.runPythonAsync(SETUP_CODE + "\n" + code);
 
-      // run the pythonSetup code
-      const stateJSON = await py.runPythonAsync("get_linked_list_state()");     // gives us json which we will parse further
+      const stateJSON = await py.runPythonAsync("get_linked_list_state()"); 
       const state = JSON.parse(stateJSON);
 
-      // update the visualizer
       console.log("graph state:", state);
       setNodes(state.nodes);
       setEdges(state.edges);
@@ -72,20 +68,25 @@ export default function Home() {
     }
   };
 
+  const handlePresetSelect = (newCode) => {
+    setCode(newCode);
+  };
+
   return (
     <main className="flex h-screen w-screen bg-black text-white overflow-hidden">
-      {/* strategy="afterInteractive" is slightly safer for heavy libs 
-         than lazyOnload in some Next.js versions 
-      */}
       <Script 
         src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js" 
         strategy="afterInteractive"
         onLoad={initPyodide} 
       />
 
-      {/* Visualizer Panel */}
       <div className="w-[60%] h-full relative border-r border-gray-800">
-        <Visualizer nodes={nodes} edges={edges}/>
+        <Visualizer 
+          nodes={nodes} 
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+        />
         <div className="absolute bottom-0 w-full h-32 bg-gray-900 border-t border-gray-700 p-2 font-mono text-xs overflow-auto opacity-90">
              <div className="text-gray-400 mb-1">CONSOLE OUTPUT:</div>
              <pre>{output}</pre>
@@ -101,7 +102,8 @@ export default function Home() {
         >
           {!isPyodideReady ? "Loading Engine..." : "Run Code ▶"}
         </button>
-        <div className="absolute top-6 right-42 z-10 flex items-center gap-2 bg-gray-800 px-3 py-1 rounded-full border border-gray-600">
+        
+        <div className="absolute top-6 right-[11rem] z-10 flex items-center gap-2 bg-gray-800 px-3 py-1 rounded-full border border-gray-600">
           <div className={`w-2 h-2 rounded-full ${isAutoRun ? "bg-green-500 animate-pulse" : "bg-red-500"}`} />
           <label className="text-xs font-bold text-gray-300 cursor-pointer select-none">
             <input 
@@ -112,12 +114,14 @@ export default function Home() {
             />
             {isAutoRun ? "Live Mode ON" : "Live Mode OFF"}
           </label>
-          </div>
+        </div>
       </div>
 
-      {/* Code Editor Panel */}
-      <div className="w-[40%] h-full">
-        <CodeEditor code={code} setCode={setCode} />
+      <div className="w-[40%] h-full flex flex-col">
+        <PresetSelector onSelect={handlePresetSelect} />
+        <div className="flex-grow relative">
+          <CodeEditor code={code} setCode={setCode} />
+        </div>
       </div>
     </main>
   );
