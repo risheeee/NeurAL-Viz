@@ -12,9 +12,10 @@ import sys
 # clean_user_memory() 
 
 class Node:
-    def __init__(self, val=0, next=None):
+    def __init__(self, val=0, next=None, prev=None):
         self.val = val
         self.next = next
+        self.prev = prev
 
 def get_linked_list_state():
     nodes_data = []
@@ -76,7 +77,7 @@ def get_linked_list_state():
         while curr:
             curr_uid = str(id(curr))
             
-            # POSITIONING
+            # A. POSITIONING
             if curr_uid not in positioned_nodes:
                 positioned_nodes[curr_uid] = {'x': curr_x, 'y': current_y}
                 
@@ -90,14 +91,28 @@ def get_linked_list_state():
                 })
                 curr_x += 150 
             
-            # EDGES
+            if hasattr(curr, 'prev') and curr.prev:
+                prev_uid = str(id(curr.prev))
+
+                if prev_uid in positioned_nodes:
+                    edges_data.append({
+                        "id": f"{curr_uid}-prev->{prev_uid}",
+                        "source": curr_uid,   
+                        "target": prev_uid,   
+                        "sourceHandle": "prev-src", 
+                        "targetHandle": "prev-tgt", 
+                        "animated": True,    
+                        "style": { "stroke": "#FFD700", "strokeDasharray": "5,5" } 
+                    })
+
+            # C. NEXT POINTER (Forward)
             if curr.next:
                 next_uid = str(id(curr.next))
                 
                 edge_type = "straight" 
-                edge_style = { "stroke": "#" }
-                src_handle = "r"
-                tgt_handle = "l"
+                edge_style = { "stroke": "#4ADE80" }
+                src_handle = "next-src"
+                tgt_handle = "next-tgt"
                 
                 # Cycle / Backward Detection
                 if next_uid in positioned_nodes:
@@ -119,9 +134,6 @@ def get_linked_list_state():
                     "animated": True,
                     "type": edge_type, 
                     "style": edge_style,
-                    "data": {
-                        "cycleOffset": 80
-                    }
                 })
                 
                 if next_uid in positioned_nodes:
@@ -129,8 +141,8 @@ def get_linked_list_state():
                     
                 curr = curr.next
             else:
-                break
-        
+                break 
+
         current_y += 150
 
     return json.dumps({"nodes": nodes_data, "edges": edges_data})
