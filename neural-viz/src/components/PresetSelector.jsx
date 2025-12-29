@@ -45,7 +45,28 @@ headA.next.next = common
 
 headB = Node(3)
 headB.next = common
-    `
+    `,
+
+    doubly: `# Doubly Linked List
+head = Node(9)
+head.next = Node(18)
+head.next.prev = head
+head.next.next = Node(27)
+head.next.next.prev = head.next
+head.next.next.next = Node(36)
+head.next.next.next.prev = head.next.next
+    `,
+
+    doublyCircular: `# Double circular Linked List
+head = Node(9)
+head.next = Node(18)
+head.next.prev = head
+head.next.next = Node(27)
+head.next.next.prev = head.next
+head.next.next.next = Node(36)
+head.next.next.next.prev = head.next.next
+head.next.next.next.next = head
+    ` 
 };
 
 export default function PresetSelector({ onSelect }) {
