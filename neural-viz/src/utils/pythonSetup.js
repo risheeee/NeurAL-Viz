@@ -3,14 +3,6 @@ import json
 import inspect
 import sys
 
-# def clean_user_memory():
-#     safe_keys = {'Node', 'get_linked_list_state', 'clear_user_memory', 'json', 'inspect', 'sys', '__name__', '__builtins__', '__doc__', '__package__', '__loader__', '__spec__'}
-#     keys_to_delete = [key for key in globals().keys() if key not in safe_keys]
-#     for key in keys_to_delete:
-#         del globals()[key]
-
-# clean_user_memory() 
-
 class Node:
     def __init__(self, val=0, next=None, prev=None):
         self.val = val

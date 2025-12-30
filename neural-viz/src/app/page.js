@@ -48,25 +48,64 @@ export default function Home() {
     }
   }
 
-  const runCode = async () => {
-    if (!pyodideRef.current) return;
-    try {
-      const py = pyodideRef.current;
-      py.setStdout({ batched: (msg) => setOutput((prev) => prev + msg + "\n") });
+  const runCode = () => {
+  setOutput("");
 
-      await py.runPythonAsync(SETUP_CODE + "\n" + code);
+  if (window.pyWorker) {
+    window.pyWorker.terminate();
+  }
 
-      const stateJSON = await py.runPythonAsync("get_linked_list_state()"); 
-      const state = JSON.parse(stateJSON);
+  const worker = new Worker("/pyWorker.js");
+  window.pyWorker = worker;
 
-      console.log("graph state:", state);
+  const safeCode = typeof code === "string" ? code : "";
+
+  const hasCode = safeCode
+  .split('\n')
+  .some(line => line.trim() && !line.trim().startsWith('#'));
+
+const indentedCode = hasCode
+  ? safeCode.split('\n').map(line => '    ' + line).join('\n')
+  : '    pass';
+
+  const protectedCode = `
+try:
+${indentedCode}
+except Exception as e:
+    raise e
+`;
+
+  const timeout = setTimeout(() => {
+    worker.terminate();
+    setOutput("⛔ Execution stopped: Infinite loop detected");
+  }, 1000);
+  
+  worker.onmessage = (e) => {
+    const { type, data } = e.data;
+
+    if (type === "stdout") {
+      setOutput(prev => prev + data + "\n");
+    }
+
+    if (type === "state") {
+      clearTimeout(timeout);
+      const state = JSON.parse(data);
       setNodes(state.nodes);
       setEdges(state.edges);
+    }
 
-    } catch (err) {
-      setOutput(`Runtime Error: ${err.message}`);
+    if (type === "error") {
+      clearTimeout(timeout);
+      setOutput(`Runtime Error: ${data}`);
     }
   };
+
+  worker.postMessage({
+    setupCode: SETUP_CODE,
+    userCode: protectedCode
+  });
+};
+
 
   const handlePresetSelect = (newCode) => {
     setCode(newCode);
