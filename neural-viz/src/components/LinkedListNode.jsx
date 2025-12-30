@@ -1,4 +1,5 @@
 import { Handle, Position } from "reactflow";
+import { motion } from "framer-motion";
 
 export default function LinkedListNode({ data }) {
   return (
@@ -6,12 +7,14 @@ export default function LinkedListNode({ data }) {
       {/* 1. The Pointers Stacked Above */}
       <div className="absolute bottom-[100%] left-1/2 -translate-x-1/2 w-max flex flex-col-reverse items-center gap-1 mb-2 pointer-events-none">
         {data.pointers && data.pointers.map((ptr) => (
-          <div 
-            key={ptr} 
+          <motion.div 
+            key={ptr}
+            layoutId={ptr}
+            transition={{type: "spring", stiffness: 300, damping: 25}} 
             className="bg-yellow-500 text-black text-[10px] px-2 py-0.5 rounded-full shadow-md font-bold uppercase tracking-wider"
           >
             {ptr} ▼
-          </div>
+          </motion.div>
         ))}
       </div>
 
