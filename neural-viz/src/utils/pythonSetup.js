@@ -10,11 +10,6 @@ class Node:
         self.next = next
         self.prev = prev
 
-
-# ===============================
-# YOUR ORIGINAL VISUALIZER LOGIC
-# ===============================
-
 def get_linked_list_state():
     nodes_data = []
     edges_data = []
@@ -135,10 +130,7 @@ def get_linked_list_state():
 
     return {"nodes": nodes_data, "edges": edges_data}
 
-
-# ===============================
-# 🔴 NEW: AST SNAPSHOT MECHANISM
-# ===============================
+# ast snapshot mechanism
 
 def __snapshot__():
     _HISTORY.append(get_linked_list_state())

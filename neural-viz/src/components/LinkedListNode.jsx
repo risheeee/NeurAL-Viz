@@ -34,6 +34,7 @@ export default function LinkedListNode({ data }) {
       <Handle type="source" position={Position.Left} id = "prev-src" className="bg-black! w-2! h-2!" style={{top:'65%'}}/>
       <Handle type="target" position={Position.Right} id = "prev-tgt" className="bg-gray-400!" style={{top:'65%'}}/>
 
+        {/* Cyclic / circulra pointers*/}
       <Handle type="source" position={Position.Bottom} id="t-src" className="bg-transparent!" style={{ left: '60%' }} />
       <Handle type="target" position={Position.Bottom} id="t-tgt" className="bg-transparent!" style={{ left: '40%' }} />
     </div>

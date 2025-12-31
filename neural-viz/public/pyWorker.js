@@ -24,16 +24,13 @@ self.onmessage = async (e) => {
     await pyodide.runPythonAsync(setupCode);
 
     // 2. Run User Code
-    // (Tracing logic is now embedded INSIDE userCode by page.js)
     try {
         await pyodide.runPythonAsync(`run_user_code("""${userCode}""")`);
     } catch (userErr) {
-        // Send error but CONTINUE so we can still fetch the history up to the crash
         self.postMessage({ type: "error", data: userErr.message || String(userErr) });
     }
 
     // 3. Fetch the Movie Reel (History)
-    // We fetch this even if the code crashed, so we can see what happened
     const historyJSON = await pyodide.runPythonAsync("get_history_json()");
     self.postMessage({ type: "history", data: historyJSON });
 
