@@ -28,6 +28,45 @@ An interactive, browser-based tool to visualize Python Linked List algorithms. B
 
 [NeurAL-Viz](https://neuralviz.vercel.app/)
 
+## Try it with LeetCode problems
+
+NeurAL-Viz is designed to help you **visualize Linked List solutions** from platforms like LeetCode.
+You can copy your Python solution directly into the editor (or even write line by line), and watch how the pointers move step by step.
+
+### recommended LeetCode problems to try
+
+- **21. Merge Two Sorted Lists**
+- **24. Swap Nodes in Pairs**
+- **61. Rotate List**
+- **83. Remove Duplicates from Sorted List**
+- **141. Linked List Cycle**
+- **206. Reverse Linked List**
+- **876. Middle of the Linked List**
+- **Anything else of your choice!**
+
+## Example Usage
+```
+# create the Linked List
+head = Node(9)
+head.next = Node(18)
+head.next.next = Node(27)
+head.next.next.next = Node(36)
+head.next.next.next.next = Node(45)
+
+prev = None
+curr = head
+
+while curr:
+    temp = curr.next
+
+    curr.next = prev
+
+    prev = curr
+    curr = temp
+    
+head = prev
+```
+
 ## 🤝 Contributing
 
 Contributions are welcome! If you find a bug or have a feature request, please open an issue or submit a pull request.
