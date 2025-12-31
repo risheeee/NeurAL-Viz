@@ -26,30 +26,7 @@ An interactive, browser-based tool to visualize Python Linked List algorithms. B
 
 ## Getting Started
 
-### 1. Clone the Repository
-
-```bash
-git clone https://github.com/your-username/linked-list-visualizer.git
-cd linked-list-visualizer
-
-```
-
-### 2. Install Dependencies
-
-```bash
-npm install
-
-```
-
-### 3. Run the Development Server
-
-```bash
-npm run dev
-
-```
-
-Open [http://localhost:3000](https://www.google.com/search?q=http://localhost:3000) with your browser.
-
+[NeurAL-Viz](https://neuralviz.vercel.app/)
 
 ## 🤝 Contributing
 
